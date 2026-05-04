@@ -1,6 +1,6 @@
 # TokenMeter
 
-[![Release](https://img.shields.io/github/v/release/otechmista/token-meter?sort=semver)](https://github.com/otechmista/token-meter/releases/latest)
+[![Release](https://img.shields.io/github/v/release/otechmista/token-meter?sort=semver)](https://github.com/otechmista/token-meter/releases/tag/v0.1.0)
 [![Release workflow](https://github.com/otechmista/token-meter/actions/workflows/release.yml/badge.svg)](https://github.com/otechmista/token-meter/actions/workflows/release.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/otechmista/token-meter)](https://goreportcard.com/report/github.com/otechmista/token-meter)
 [![Go version](https://img.shields.io/github/go-mod/go-version/otechmista/token-meter)](https://github.com/otechmista/token-meter/blob/main/go.mod)
