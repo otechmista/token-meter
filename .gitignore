@@ -1,0 +1,5 @@
+bin/
+dist/*
+!dist/.gitkeep
+token-meter
+token-meter.exe
