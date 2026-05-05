@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TokenMeter Docs</title>
-    <meta name="description" content="Instale e use o TokenMeter para medir tokens de projetos locais." />
+    <title>TokenMeter — Local Token & Cost Analyzer</title>
+    <meta name="description" content="Measure tokens, files, lines, estimated cost, and architecture weight. All local, no code leaves your machine." />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
@@ -12,56 +12,196 @@
         theme: {
           extend: {
             colors: {
-              ink: "#24292f",
-              brand: "#0969da",
-              border: "#d0d7de",
-              canvas: "#f6f8fa",
-              success: "#1a7f37"
+              /* GitHub Dark */
+              "gh-bg":       "#0d1117",
+              "gh-surface":  "#161b22",
+              "gh-border":   "#30363d",
+              "gh-text":     "#e6edf3",
+              "gh-muted":    "#8b949e",
+              "gh-link":     "#58a6ff",
+              /* Monokai accents */
+              "mk-green":    "#a6e22e",
+              "mk-yellow":   "#e6db74",
+              "mk-orange":   "#fd971f",
+              "mk-pink":     "#f92672",
+              "mk-purple":   "#ae81ff",
+              "mk-cyan":     "#66d9e8",
+            },
+            fontFamily: {
+              mono: ["'JetBrains Mono'", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
             }
           }
         }
       };
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; }
+
+      body { background-color: #0d1117; color: #e6edf3; }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: #161b22; }
+      ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: #58a6ff; }
+
+      /* Code blocks */
+      .code-block {
+        position: relative;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid #30363d;
+        background: #0d1117;
+      }
+      .code-block pre {
+        overflow-x: auto;
+        padding: 2.75rem 1.25rem 1.25rem;
+        font-size: 0.8125rem;
+        line-height: 1.75;
+        color: #e6edf3;
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .code-block .lang-badge {
+        position: absolute;
+        top: 0.5rem;
+        left: 0.75rem;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #30363d;
+        background: #161b22;
+        color: #8b949e;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .code-block .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        height: 1.75rem;
+        padding: 0 0.625rem;
+        border-radius: 0.375rem;
+        border: 1px solid #30363d;
+        background: #161b22;
+        color: #8b949e;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .code-block .copy-btn:hover { border-color: #58a6ff; color: #58a6ff; background: #0d1117; }
+      .code-block .copy-btn.copied { border-color: #a6e22e; color: #a6e22e; }
+
+      /* Monokai syntax tint on output block */
+      .output-block .kw  { color: #f92672; }
+      .output-block .str { color: #e6db74; }
+      .output-block .num { color: #ae81ff; }
+      .output-block .cm  { color: #75715e; }
+      .output-block .fn  { color: #a6e22e; }
+      .output-block .op  { color: #66d9e8; }
+
+      /* Tab buttons */
+      .tab-btn { transition: background 0.15s, color 0.15s; }
+      .tab-btn.active {
+        background: #58a6ff;
+        color: #0d1117;
+        box-shadow: 0 1px 3px rgba(88,166,255,0.3);
+      }
+      .tab-btn:not(.active) { color: #8b949e; }
+      .tab-btn:not(.active):hover { color: #e6edf3; background: #21262d; }
+
+      /* Feature card accent line */
+      .feature-card { border-top: 2px solid transparent; }
+      .feature-card:nth-child(1) { border-top-color: #66d9e8; }
+      .feature-card:nth-child(2) { border-top-color: #a6e22e; }
+      .feature-card:nth-child(3) { border-top-color: #fd971f; }
+      .feature-card:nth-child(4) { border-top-color: #ae81ff; }
+
+      /* Glow on hero title */
+      .hero-title { text-shadow: 0 0 40px rgba(88,166,255,0.15); }
+
+      /* Section card */
+      .section-card {
+        border-radius: 0.5rem;
+        border: 1px solid #30363d;
+        background: #161b22;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      }
+
+      /* inline code */
+      .inline-code {
+        background: #0d1117;
+        border: 1px solid #30363d;
+        border-radius: 0.25rem;
+        padding: 0.125rem 0.4rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8em;
+        color: #66d9e8;
+      }
+
+      /* Gradient separator line */
+      .sep {
+        height: 1px;
+        background: linear-gradient(to right, transparent, #30363d, #58a6ff33, #30363d, transparent);
+        margin: 1.5rem 0;
+      }
+    </style>
   </head>
-  <body class="bg-canvas text-ink">
-    <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-      <header class="rounded-md border border-border bg-white p-6 shadow-sm sm:p-8">
-        <div class="inline-flex items-center gap-2 rounded-full border border-border bg-canvas px-3 py-1 text-sm font-semibold text-slate-700">
-          <i data-lucide="gauge" class="h-4 w-4"></i>
-          local token meter
+  <body>
+    <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+
+      <!-- Hero -->
+      <header class="section-card sm:p-8">
+        <div class="inline-flex items-center gap-2 rounded-full border border-gh-border bg-gh-bg px-3 py-1 text-xs font-semibold text-gh-muted uppercase tracking-widest font-mono">
+          <i data-lucide="gauge" class="h-3.5 w-3.5 text-mk-cyan"></i>
+          CLI · local token analyzer
         </div>
 
-        <div class="mt-5 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div class="mt-6 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <h1 class="text-4xl font-bold tracking-normal text-slate-950 sm:text-5xl">TokenMeter</h1>
-            <p class="mt-3 max-w-2xl text-lg text-slate-600">
-              Meca tokens, arquivos, linhas, custo estimado e peso de arquitetura. Tudo local, sem enviar codigo para fora.
+            <h1 class="hero-title text-5xl font-bold tracking-tight text-gh-text sm:text-6xl font-mono">
+              Token<span class="text-mk-cyan">Meter</span>
+            </h1>
+            <p class="mt-4 max-w-2xl text-base text-gh-muted leading-relaxed">
+              Measure tokens, files, lines, estimated cost, and architecture weight for any local project.
+              No data leaves your machine.
             </p>
-            <div class="mt-4 flex flex-wrap items-center gap-2">
-              <a href="https://github.com/otechmista/token-meter/releases/latest" aria-label="Latest TokenMeter release">
-                <img class="h-5" alt="Release" src="https://img.shields.io/github/v/release/otechmista/token-meter?sort=semver" />
+            <div class="mt-5 flex flex-wrap items-center gap-2">
+              <a href="https://github.com/otechmista/token-meter/releases/latest" aria-label="Latest release">
+                <img class="h-5" alt="Release" src="https://img.shields.io/github/v/release/otechmista/token-meter?sort=semver&style=flat-square&color=58a6ff&labelColor=161b22" />
               </a>
-              <a href="https://github.com/otechmista/token-meter/actions/workflows/release.yml" aria-label="Release workflow status">
-                <img class="h-5" alt="Release workflow" src="https://github.com/otechmista/token-meter/actions/workflows/release.yml/badge.svg" />
+              <a href="https://github.com/otechmista/token-meter/actions/workflows/release.yml" aria-label="CI status">
+                <img class="h-5" alt="CI" src="https://github.com/otechmista/token-meter/actions/workflows/release.yml/badge.svg" />
               </a>
               <a href="https://goreportcard.com/report/github.com/otechmista/token-meter" aria-label="Go Report Card">
                 <img class="h-5" alt="Go Report Card" src="https://goreportcard.com/badge/github.com/otechmista/token-meter" />
               </a>
               <a href="https://github.com/otechmista/token-meter/blob/main/go.mod" aria-label="Go version">
-                <img class="h-5" alt="Go version" src="https://img.shields.io/github/go-mod/go-version/otechmista/token-meter" />
+                <img class="h-5" alt="Go version" src="https://img.shields.io/github/go-mod/go-version/otechmista/token-meter?style=flat-square&color=a6e22e&labelColor=161b22" />
               </a>
-              <a href="#instalar" aria-label="Supported platforms">
-                <img class="h-5" alt="Platforms: Windows and Linux" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-blue" />
+              <a href="#install" aria-label="Platforms">
+                <img class="h-5" alt="Platforms" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-ae81ff?style=flat-square&labelColor=161b22" />
               </a>
             </div>
           </div>
 
           <div class="flex flex-wrap gap-3">
-            <a class="inline-flex h-10 items-center gap-2 rounded-md border border-[#2c974b] bg-[#2da44e] px-4 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b]" href="https://github.com/otechmista/token-meter/releases">
+            <a class="inline-flex h-10 items-center gap-2 rounded-md border border-mk-green bg-mk-green/10 px-4 text-sm font-semibold text-mk-green shadow-sm hover:bg-mk-green/20 transition-colors font-mono"
+               href="https://github.com/otechmista/token-meter/releases">
               <i data-lucide="download" class="h-4 w-4"></i>
-              Baixar
+              Download
             </a>
-            <a class="inline-flex h-10 items-center gap-2 rounded-md border border-border bg-canvas px-4 text-sm font-semibold text-slate-800 shadow-sm hover:bg-slate-100" href="https://github.com/otechmista/token-meter">
+            <a class="inline-flex h-10 items-center gap-2 rounded-md border border-gh-border bg-gh-bg px-4 text-sm font-semibold text-gh-muted shadow-sm hover:border-gh-link hover:text-gh-link transition-colors font-mono"
+               href="https://github.com/otechmista/token-meter">
               <i data-lucide="github" class="h-4 w-4"></i>
               GitHub
             </a>
@@ -69,75 +209,83 @@
         </div>
       </header>
 
-      <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-md border border-border bg-white p-5">
-          <i data-lucide="hash" class="mb-3 h-5 w-5 text-success"></i>
-          <strong class="block text-xl">Tokens</strong>
-          <span class="text-sm text-slate-500">total e por arquivo</span>
+      <!-- Feature cards -->
+      <section class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="feature-card section-card">
+          <i data-lucide="hash" class="mb-3 h-5 w-5 text-mk-cyan"></i>
+          <strong class="block text-base font-semibold text-gh-text font-mono">Tokens</strong>
+          <span class="text-sm text-gh-muted">total &amp; per file</span>
         </div>
-        <div class="rounded-md border border-border bg-white p-5">
-          <i data-lucide="files" class="mb-3 h-5 w-5 text-success"></i>
-          <strong class="block text-xl">Arquivos</strong>
-          <span class="text-sm text-slate-500">quantidade lida</span>
+        <div class="feature-card section-card">
+          <i data-lucide="files" class="mb-3 h-5 w-5 text-mk-green"></i>
+          <strong class="block text-base font-semibold text-gh-text font-mono">Files</strong>
+          <span class="text-sm text-gh-muted">count &amp; lines read</span>
         </div>
-        <div class="rounded-md border border-border bg-white p-5">
-          <i data-lucide="badge-dollar-sign" class="mb-3 h-5 w-5 text-success"></i>
-          <strong class="block text-xl">Custo</strong>
-          <span class="text-sm text-slate-500">input, output e total</span>
+        <div class="feature-card section-card">
+          <i data-lucide="badge-dollar-sign" class="mb-3 h-5 w-5 text-mk-orange"></i>
+          <strong class="block text-base font-semibold text-gh-text font-mono">Cost</strong>
+          <span class="text-sm text-gh-muted">input, output &amp; total</span>
         </div>
-        <div class="rounded-md border border-border bg-white p-5">
-          <i data-lucide="scale" class="mb-3 h-5 w-5 text-success"></i>
-          <strong class="block text-xl">Peso</strong>
-          <span class="text-sm text-slate-500">arquitetura leve ou pesada</span>
+        <div class="feature-card section-card">
+          <i data-lucide="scale" class="mb-3 h-5 w-5 text-mk-purple"></i>
+          <strong class="block text-base font-semibold text-gh-text font-mono">Weight</strong>
+          <span class="text-sm text-gh-muted">light or heavy architecture</span>
         </div>
       </section>
 
-      <section id="instalar" class="mt-6 rounded-md border border-border bg-white p-6 shadow-sm">
+      <!-- Install -->
+      <section id="install" class="mt-5 section-card">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="flex items-center gap-2 text-2xl font-bold">
-            <i data-lucide="terminal" class="h-6 w-6 text-brand"></i>
-            Instalar
+          <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+            <i data-lucide="terminal" class="h-5 w-5 text-mk-cyan"></i>
+            Installation
           </h2>
-          <div class="inline-flex rounded-md border border-border bg-canvas p-1">
-            <button class="tab-btn rounded px-3 py-1.5 text-sm font-semibold" data-tab="windows">Windows</button>
-            <button class="tab-btn rounded px-3 py-1.5 text-sm font-semibold" data-tab="linux">Linux</button>
+          <div class="inline-flex rounded-md border border-gh-border bg-gh-bg p-1 gap-1">
+            <button class="tab-btn rounded px-3 py-1.5 text-sm font-semibold font-mono" data-tab="windows">Windows</button>
+            <button class="tab-btn rounded px-3 py-1.5 text-sm font-semibold font-mono" data-tab="linux">Linux</button>
           </div>
         </div>
 
         <div class="tab-panel mt-5" id="tab-windows">
-          <p class="text-slate-600">PowerShell. Baixa a ultima release, cria a pasta local e adiciona <code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">tkm</code> no Path do usuario.</p>
+          <p class="text-sm text-gh-muted leading-relaxed">
+            Run in <strong class="text-gh-text">PowerShell</strong>. Downloads the latest release, creates a local folder, and adds
+            <code class="inline-code">tkm</code> to your user <code class="inline-code">PATH</code>.
+          </p>
           <div class="code-block mt-3" data-lang="powershell">
             <pre><code>irm https://raw.githubusercontent.com/otechmista/token-meter/main/install/install.ps1 | iex</code></pre>
           </div>
-          <p class="mt-4 text-slate-600">Feche e abra o PowerShell.</p>
+          <p class="mt-4 text-sm text-gh-muted">Restart PowerShell, then verify:</p>
           <div class="code-block mt-3" data-lang="powershell">
             <pre><code>tkm .</code></pre>
           </div>
-          <p class="mt-4 text-slate-600">Para atualizar, rode o mesmo comando de instalacao de novo. Ele substitui o binario anterior.</p>
+          <p class="mt-4 text-sm text-gh-muted">To upgrade, run the same install command again — it replaces the existing binary.</p>
         </div>
 
         <div class="tab-panel mt-5 hidden" id="tab-linux">
-          <p class="text-slate-600">Linux/Ubuntu. Baixa a ultima release, cria <code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">~/.local/bin</code> e instala como <code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">tkm</code>.</p>
+          <p class="text-sm text-gh-muted leading-relaxed">
+            Run in your shell. Creates <code class="inline-code">~/.local/bin</code> if needed and installs the binary as <code class="inline-code">tkm</code>.
+          </p>
           <div class="code-block mt-3" data-lang="bash">
             <pre><code>curl -fsSL https://raw.githubusercontent.com/otechmista/token-meter/main/install/install.sh | sh</code></pre>
           </div>
-          <p class="mt-4 text-slate-600">Ou com wget:</p>
+          <p class="mt-4 text-sm text-gh-muted">Or with <code class="inline-code">wget</code>:</p>
           <div class="code-block mt-3" data-lang="bash">
             <pre><code>wget -qO- https://raw.githubusercontent.com/otechmista/token-meter/main/install/install.sh | sh</code></pre>
           </div>
-          <p class="mt-4 text-slate-600">Para atualizar, rode o mesmo comando de instalacao de novo. Ele substitui o binario anterior.</p>
+          <p class="mt-4 text-sm text-gh-muted">To upgrade, run the same install command again — it replaces the existing binary.</p>
         </div>
       </section>
 
-      <section class="mt-6 grid gap-6 lg:grid-cols-2">
-        <article class="rounded-md border border-border bg-white p-6 shadow-sm">
-          <h2 class="flex items-center gap-2 text-2xl font-bold">
-            <i data-lucide="play" class="h-6 w-6 text-brand"></i>
-            Usar
+      <!-- Usage + Flags -->
+      <section class="mt-5 grid gap-5 lg:grid-cols-2">
+        <article class="section-card">
+          <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+            <i data-lucide="play" class="h-5 w-5 text-mk-green"></i>
+            Usage
           </h2>
           <div class="code-block mt-4" data-lang="bash">
             <pre><code>tkm .
-tkm /caminho/do/projeto
+tkm /path/to/project
 tkm --top 20 .
 tkm --json .
 tkm --input-price 1 --output-price 5 .
@@ -145,28 +293,32 @@ tkm --output-tokens 1000 .</code></pre>
           </div>
         </article>
 
-        <article class="rounded-md border border-border bg-white p-6 shadow-sm">
-          <h2 class="flex items-center gap-2 text-2xl font-bold">
-            <i data-lucide="sliders-horizontal" class="h-6 w-6 text-brand"></i>
-            Parametros
+        <article class="section-card">
+          <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+            <i data-lucide="sliders-horizontal" class="h-5 w-5 text-mk-yellow"></i>
+            Flags
           </h2>
-          <div class="mt-4 space-y-3 text-slate-600">
-            <p><code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">--top 20</code>: mostra mais arquivos pesados. Padrao: 10.</p>
-            <p><code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">--input-price 1</code>: preco por 1M tokens de entrada. Padrao: 1.</p>
-            <p><code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">--output-price 5</code>: preco por 1M tokens de saida. Padrao: 5.</p>
-            <p><code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">--output-tokens 1000</code>: tokens de saida para custo. Padrao: 0.</p>
-            <p><code class="rounded bg-canvas px-1.5 py-0.5 font-semibold text-brand">--json</code>: saida em JSON.</p>
+          <div class="mt-4 space-y-3 text-sm text-gh-muted">
+            <p><code class="inline-code">--top 20</code> — show more heavy files. Default: <span class="text-mk-purple font-mono">10</span>.</p>
+            <p><code class="inline-code">--input-price 1</code> — price per 1M input tokens. Default: <span class="text-mk-purple font-mono">1</span>.</p>
+            <p><code class="inline-code">--output-price 5</code> — price per 1M output tokens. Default: <span class="text-mk-purple font-mono">5</span>.</p>
+            <p><code class="inline-code">--output-tokens 1000</code> — expected output tokens for cost estimate. Default: <span class="text-mk-purple font-mono">0</span>.</p>
+            <p><code class="inline-code">--json</code> — emit results as JSON.</p>
           </div>
         </article>
       </section>
 
-      <section class="mt-6 rounded-md border border-border bg-white p-6 shadow-sm">
-        <h2 class="flex items-center gap-2 text-2xl font-bold">
-          <i data-lucide="list-tree" class="h-6 w-6 text-brand"></i>
-          Saida
+      <!-- Output -->
+      <section class="mt-5 section-card">
+        <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+          <i data-lucide="list-tree" class="h-5 w-5 text-mk-cyan"></i>
+          Sample Output
         </h2>
-        <p class="mt-2 text-slate-600">A saida separa resumo, custo, arquivos pesados e pastas pesadas. Valores sao estimativas e podem mudar por provedor, modelo, cache, tokenizer e tamanho da resposta.</p>
-        <div class="code-block mt-4" data-lang="text">
+        <p class="mt-2 text-sm text-gh-muted">
+          Results are split into summary, cost estimate, heavy files, and heavy folders.
+          All values are estimates — actual costs vary by provider pricing, tokenizer, model, cache, and response size.
+        </p>
+        <div class="code-block output-block mt-4" data-lang="text">
           <pre><code>TokenMeter report
 C:\projects\app
 
@@ -185,8 +337,6 @@ Cost estimate
   Input cost:          $0.0083
   Output cost:         $0.0000
   Total cost:          $0.0083
-  Estimated cost:      $0.0083
-Values are estimates and may change with provider pricing, tokenizer, model, cache, and output size.
 
 Heavy files
       3415 tokens     437 lines  main.go
@@ -198,39 +348,50 @@ Heavy folders
         </div>
       </section>
 
-      <section class="mt-6 rounded-md border border-border bg-white p-6 shadow-sm">
-        <h2 class="flex items-center gap-2 text-2xl font-bold">
-          <i data-lucide="scan-text" class="h-6 w-6 text-brand"></i>
-          O que mede
-        </h2>
-        <ul class="mt-4 grid gap-2 text-slate-600 sm:grid-cols-2">
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>total de tokens</li>
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>arquivos e linhas</li>
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>arquivos pesados</li>
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>pastas pesadas</li>
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>custo estimado</li>
-          <li class="flex gap-2"><i data-lucide="check" class="mt-1 h-4 w-4 text-success"></i>peso da arquitetura</li>
-        </ul>
-      </section>
+      <!-- What it measures + Colors -->
+      <section class="mt-5 grid gap-5 lg:grid-cols-2">
+        <article class="section-card">
+          <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+            <i data-lucide="scan-text" class="h-5 w-5 text-mk-orange"></i>
+            What it measures
+          </h2>
+          <ul class="mt-4 space-y-2 text-sm text-gh-muted">
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>Total token count</li>
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>File &amp; line count</li>
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>Heaviest files by tokens</li>
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>Heaviest folders by tokens</li>
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>Estimated cost (input &amp; output)</li>
+            <li class="flex gap-2 items-center"><i data-lucide="check" class="h-4 w-4 text-mk-green flex-shrink-0"></i>Architecture weight rating</li>
+          </ul>
+        </article>
 
-      <section class="mt-6 rounded-md border border-border bg-white p-6 shadow-sm">
-        <h2 class="flex items-center gap-2 text-2xl font-bold">
-          <i data-lucide="palette" class="h-6 w-6 text-brand"></i>
-          Cores no terminal
-        </h2>
-        <p class="mt-2 text-slate-600">No Windows, a saida vem sem cor por padrao para evitar codigos ANSI quebrados no PowerShell.</p>
-        <div class="code-block mt-4" data-lang="powershell">
-          <pre><code>$env:TOKENMETER_COLOR=1
+        <article class="section-card">
+          <h2 class="flex items-center gap-2 text-xl font-bold text-gh-text font-mono">
+            <i data-lucide="palette" class="h-5 w-5 text-mk-pink"></i>
+            Terminal Colors
+          </h2>
+          <p class="mt-2 text-sm text-gh-muted leading-relaxed">
+            On Windows, color output is off by default to avoid broken ANSI codes in older PowerShell versions.
+            Enable it with:
+          </p>
+          <div class="code-block mt-3" data-lang="powershell">
+            <pre><code>$env:TOKENMETER_COLOR=1
 tkm .</code></pre>
-        </div>
-        <p class="mt-4 text-slate-600">Para desativar cor em qualquer sistema:</p>
-        <div class="code-block mt-3" data-lang="bash">
-          <pre><code>NO_COLOR=1 tkm .</code></pre>
-        </div>
+          </div>
+          <p class="mt-4 text-sm text-gh-muted">To disable color on any system:</p>
+          <div class="code-block mt-3" data-lang="bash">
+            <pre><code>NO_COLOR=1 tkm .</code></pre>
+          </div>
+        </article>
       </section>
 
-      <footer class="mt-8 rounded-md border border-border bg-white p-4 text-sm text-slate-600">
-        GitHub Pages: Settings -> Pages -> Deploy from a branch -> main -> /docs.
+      <!-- Footer -->
+      <footer class="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-md border border-gh-border bg-gh-surface px-5 py-4 text-xs text-gh-muted font-mono">
+        <span>Created by otechmista <i data-lucide="heart" class="h-3.5 w-3.5 inline text-mk-pink"></i> open source</span>
+        <a href="https://github.com/otechmista/token-meter" class="inline-flex items-center gap-1.5 hover:text-gh-link transition-colors">
+          <i data-lucide="github" class="h-3.5 w-3.5"></i>
+          otechmista/token-meter
+        </a>
       </footer>
     </main>
 
@@ -240,35 +401,30 @@ tkm .</code></pre>
           panel.classList.toggle("hidden", panel.id !== `tab-${name}`);
         });
         document.querySelectorAll(".tab-btn").forEach((button) => {
-          const active = button.dataset.tab === name;
-          button.classList.toggle("bg-white", active);
-          button.classList.toggle("text-slate-900", active);
-          button.classList.toggle("shadow-sm", active);
-          button.classList.toggle("text-slate-600", !active);
+          button.classList.toggle("active", button.dataset.tab === name);
         });
       }
 
       function setupCodeBlocks() {
         document.querySelectorAll(".code-block").forEach((block) => {
-          block.className = "code-block relative overflow-hidden rounded-md border border-border bg-canvas";
           const lang = block.dataset.lang || "text";
-          const pre = block.querySelector("pre");
           const code = block.querySelector("code");
-          pre.className = "overflow-x-auto p-4 pt-10 text-sm leading-6 text-slate-800";
 
           const label = document.createElement("span");
-          label.className = "absolute left-3 top-2 rounded border border-border bg-white px-2 py-0.5 text-xs font-semibold uppercase tracking-normal text-slate-600";
+          label.className = "lang-badge";
           label.textContent = lang;
 
           const button = document.createElement("button");
-          button.className = "absolute right-2 top-2 inline-flex h-7 items-center gap-1 rounded border border-border bg-white px-2 text-xs font-semibold text-slate-700 hover:bg-slate-100";
-          button.innerHTML = '<i data-lucide="copy" class="h-3.5 w-3.5"></i><span>copiar</span>';
+          button.className = "copy-btn";
+          button.innerHTML = '<i data-lucide="copy" class="h-3 w-3"></i><span>copy</span>';
           button.addEventListener("click", async () => {
             await navigator.clipboard.writeText(code.innerText);
-            button.querySelector("span").textContent = "copiado";
+            button.classList.add("copied");
+            button.querySelector("span").textContent = "copied!";
             setTimeout(() => {
-              button.querySelector("span").textContent = "copiar";
-            }, 1200);
+              button.classList.remove("copied");
+              button.querySelector("span").textContent = "copy";
+            }, 1400);
           });
 
           block.append(label, button);
